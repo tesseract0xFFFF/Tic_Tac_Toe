@@ -6,6 +6,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    gap: 10px;
 }
 
 .tictactoeGrid{
@@ -16,6 +17,8 @@
 }
 
 .cell{
-
+    display: flex;
+    justify-content: center;
+    align-items: center;
     background-color: red;
 }
