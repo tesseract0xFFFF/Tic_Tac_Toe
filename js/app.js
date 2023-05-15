@@ -28,13 +28,22 @@ const gameController = () => {
   const players = [player1, player2];
   let currentPlayer = players[0];
 
+  // keeping track of occupied cells.
+  let occupiedCellCount = 0;
+  const incrementCellcount = () => occupiedCellCount++;
+
   const switchPlayer = () => {
     currentPlayer = currentPlayer === players[0] ? players[1] : players[0];
     const currentPlayerDisplay = document.querySelector('.currentPlayer');
     currentPlayerDisplay.textContent = `${currentPlayer.getName()}'s turn`;
   };
 
-  const getCurrentPlayer = () => currentPlayer;
+  // checks for a win.
+  const winCheck = () => {
+    if (occupiedCellCount === 9) {
+
+    }
+  };
 
   // Playes a round.
   const playRound = (obj) => {
@@ -43,6 +52,7 @@ const gameController = () => {
       currentCell.occupied = true;
       currentCell.mark = currentPlayer.getMark();
       currentCell.domElement.textContent = `${currentCell.mark}`;
+      incrementCellcount();
       switchPlayer();
     }
   };
