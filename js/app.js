@@ -23,41 +23,73 @@ const player = (name, mark) => {
 
 const gameController = () => {
   const player1 = player('Player1', 'x');
-  const player2 = player('Player2', 'o');
+  const occupiedCells = [];
+  // const player2 = player('Player2', 'o');
 
-  const players = [player1, player2];
-  let currentPlayer = players[0];
+  // const players = [player1, player2];
+  // const currentPlayer = players[0];
 
   // keeping track of occupied cells.
   let occupiedCellCount = 0;
   const incrementCellcount = () => occupiedCellCount++;
 
-  const switchPlayer = () => {
-    currentPlayer = currentPlayer === players[0] ? players[1] : players[0];
-    const currentPlayerDisplay = document.querySelector('.currentPlayer');
-    currentPlayerDisplay.textContent = `${currentPlayer.getName()}'s turn`;
+  // const switchPlayer = () => {
+  //   currentPlayer = currentPlayer === players[0] ? players[1] : players[0];
+  //   const currentPlayerDisplay = document.querySelector('.currentPlayer');
+  //   currentPlayerDisplay.textContent = `${currentPlayer.getName()}'s turn`;
+  // };
+
+  // generates a pseudo-random number from 0 to 2
+  const cpuRandomChoice = () => Math.floor(Math.random() * 3);
+
+  // gets a random cell.
+  const getRandomCell = () => {
+    const randomRow = cpuRandomChoice();
+    const randomColumn = cpuRandomChoice();
+    const randomCell = gameBoard.boardArray[randomRow][randomColumn];
+    return randomCell;
+  };
+
+  // plays a cpu turn.
+  const cpuTurn = () => {
+    const cpuMark = 'o';
+    let randomCell = getRandomCell();
+    // checks whether reandomCell is already occupied or not.
+    while (occupiedCells.includes(randomCell)) {
+      randomCell = getRandomCell();
+    }
+    randomCell.occupied = true;
+    occupiedCells.push(randomCell);
+    randomCell.mark = cpuMark;
+    randomCell.domElement.textContent = `${randomCell.mark}`;
+    incrementCellcount();
   };
 
   // checks for a win.
-  const winCheck = () => {
-    if (occupiedCellCount === 9) {
+  // const winCheck = () => {
+  //   if (occupiedCellCount === 9) {
 
-    }
-  };
+  //   }
+  // };
 
   // Playes a round.
   const playRound = (obj) => {
     const currentCell = obj;
     if (obj.occupied === false) {
       currentCell.occupied = true;
-      currentCell.mark = currentPlayer.getMark();
+      occupiedCells.push(currentCell);
+      currentCell.mark = player1.getMark();
       currentCell.domElement.textContent = `${currentCell.mark}`;
       incrementCellcount();
-      switchPlayer();
+      if (occupiedCellCount === 9) {
+        alert('full board');
+        return;
+      }
+      cpuTurn();
     }
   };
   return {
-    playRound, player1, player2,
+    playRound, player1,
   };
 };
 
