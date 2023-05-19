@@ -30,7 +30,8 @@ const countingCells = () => {
   let occupiedCellCount = 0;
   const incrementCellCount = () => { occupiedCellCount += 1; };
   const resetCellCount = () => { occupiedCellCount = 0; };
-  return { incrementCellCount, resetCellCount };
+  const getCellCount = () => occupiedCellCount;
+  return { incrementCellCount, resetCellCount, getCellCount };
 };
 
 const gameController = () => {
