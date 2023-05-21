@@ -4,6 +4,7 @@ const gameBoard = (() => {
   const boardArray = [];
   // keeps track of occupied cells.
   const occupiedCells = [];
+  const consecutiveMarks = 0;
 
   for (let i = 0; i < (rows); i += 1) {
     boardArray[i] = [];
@@ -14,7 +15,7 @@ const gameBoard = (() => {
 
   // const currentBoardState = []; // used to determine whether someone has won or not.
   return {
-    boardArray, rows, columns, occupiedCells,
+    boardArray, rows, columns, occupiedCells, consecutiveMarks,
   };
 })();
 
@@ -37,6 +38,7 @@ const countingCells = () => {
 const gameController = () => {
   const player1 = player('Player1', 'x');
   const cellCount = countingCells();
+
   // generates a pseudo-random number from 0 to 2
   const cpuRandomChoice = () => Math.floor(Math.random() * 3);
 
@@ -85,37 +87,60 @@ const gameController = () => {
   };
 
   // checks for a win.
-  // const winCheck = () => {
-  //   const player1Wins = ['xxx******', '***xxx***', '******xxx', 'x**x**x**', '*x**x**x*', '**x**x**x', 'x***x***x', '**x*x*x**'];
-  //   const cpuWins = ['ooo******', '***ooo***', '******ooo', 'o**o**o**', '*o**o**o*', '**o**o**o', 'o***o***o', '**o*o*o**'];
-  //   gameBoard.boardArray.forEach((subArray) => {
-  //     subArray.forEach((cell) => { gameBoard.currentBoardState.push(cell.mark); });
-  //   });
-  //   const boardStateConvertedToString = gameBoard.currentBoardState.join('');
-  //   // the arrays above do not contain every winning map in existence. i am only
-  //   // looking for 8 states for each player.
-  //   const player1WinState = boardStateConvertedToString.replaceAll('o', '*');
-  //   const cpuWinState = boardStateConvertedToString.replaceAll('o', '*');
-  //   // currentBoardState is rendered every time winCheck is invoked.
-  //   gameBoard.currentBoardState.length = 0;
-  //   // checks if player 1 won or not.
-  //   if (player1Wins.includes(player1WinState)) {
-  //     alert('player1 wins!');
-  //     return 0;
-  //   }
+  const winCheck = (mark) => {
+    // check for horizontal wins;
 
-  //   if (cpuWins.includes(cpuWinState)) {
-  //     alert('cpuWins wins!');
-  //     return 1;
-  //   }
+    for (let i = 0; i < (gameBoard.rows); i += 1) {
+      gameBoard.consecutiveMarks = 0;
+      for (let j = 0; j < (gameBoard.columns); j += 1) {
+        if (gameBoard.boardArray[i][j].mark === mark) {
+          gameBoard.consecutiveMarks += 1;
+          // check if there are 3 consecutive marks of the same type in the current row.
+          if (gameBoard.consecutiveMarks === 3) {
+            return true;
+          }
+        } else {
+          gameBoard.consecutiveMarks = 0;
+        }
+      }
+    }
 
-  //   if (cellCount.occupiedCellCount === 9) {
-  //     alert('tie!');
-  //     return 2;
-  //   }
+    // check for vertical wins
+    for (let j = 0; j < (gameBoard.columns); j += 1) {
+      gameBoard.consecutiveMarks = 0;
+      for (let i = 0; i < (gameBoard.rows); i += 1) {
+        if (gameBoard.boardArray[i][j].mark === mark) {
+          gameBoard.consecutiveMarks += 1;
+          // check if there are 3 consecutive marks of the same type in the current column.
+          if (gameBoard.consecutiveMarks === 3) {
+            return true;
+          }
+        } else {
+          gameBoard.consecutiveMarks = 0;
+        }
+      }
+    }
+    // check for diagonal wins.
+    if (gameBoard.boardArray[0][0].mark === mark
+      && gameBoard.boardArray[1][1].mark === mark
+       && gameBoard.boardArray[2][2].mark === mark) {
+      return true;
+    }
+    if (gameBoard.boardArray[0][2].mark === mark
+       && gameBoard.boardArray[1][1].mark === mark
+        && gameBoard.boardArray[2][0].mark === mark) {
+      return true;
+    }
+  };
 
-  //   return false;
-  // };
+  // sets all cells on board as occupied.
+  const occupyAllCells = () => {
+    for (let i = 0; i < (gameBoard.rows); i += 1) {
+      for (let j = 0; j < (gameBoard.columns); j += 1) {
+        gameBoard.boardArray[i][j].occupied = true;
+      }
+    }
+  };
 
   // Playes a round.
   const playRound = (obj) => {
@@ -126,24 +151,21 @@ const gameController = () => {
       currentCell.mark = player1.getMark();
       currentCell.domElement.textContent = `${currentCell.mark}`;
       cellCount.incrementCellCount();
-      // check for a win or a tie.
-      // const winOrNot = winCheck();
-      // if (winOrNot === 0) {
-      //   const announcement = document.querySelector('.announcer');
-      //   announcement.textContent = 'Player1 has won!';
-      //   return;
-      // }
-      // if (winOrNot === 1) {
-      //   const announcement = document.querySelector('.announcer');
-      //   announcement.textContent = 'cpu has won!';
-      //   return;
-      // }
-      // if (winOrNot === 2) {
-      //   const announcement = document.querySelector('.announcer');
-      //   announcement.textContent = 'tie!';
-      //   return;
-      // }
+      const winOrNotPlayer = winCheck('x');
+      if (winOrNotPlayer === true) {
+        occupyAllCells();
+        const announcement = document.querySelector('.announcer');
+        announcement.textContent = 'Player1 has won!';
+        return;
+      }
+
       cpuTurn();
+      const winOrNotCpu = winCheck('o');
+      if (winOrNotCpu === true) {
+        occupyAllCells();
+        const announcement = document.querySelector('.announcer');
+        announcement.textContent = 'CPU has won!';
+      }
     }
   };
   return {
